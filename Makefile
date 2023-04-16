@@ -7,7 +7,7 @@ wire: ## Generate wire
 	@wire ./internal/provider/.
 
 .PHONY: build
-build: wire ## Build binary
+build: ## Build binary
 	@go build -o bin/aquafarm-rest ./cmd/aquafarm-rest
 
 .PHONY: run
