@@ -1,0 +1,72 @@
+version: '3.5'
+services:
+  postgres:
+    container_name: aquafarm-postgres
+    image: postgres:15.2-alpine
+    environment:
+      POSTGRES_USER: aquafarm
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+      - postgres-data:/data/postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U aquafarm" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aquafarm-net
+
+  redis:
+    container_name: aquafarm-redis
+    command: sh -c "redis-server --appendonly yes"
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - aquafarm-net
+
+  app:
+    container_name: aquafarm-app
+    build: ./
+    restart: always
+    environment:
+      ENV: docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    networks:
+      - aquafarm-net
+
+  goose:
+    container_name: goose
+    image: gomicro/goose:3.7.0
+    command: goose postgres up
+    environment:
+      GOOSE_DBSTRING: "host=postgres port=5432 user=aquafarm password=password dbname=aquafarm sslmode=disable"
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - aquafarm-net
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  aquafarm-net:
+    driver: bridge
