@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 
+	"go.uber.org/zap"
+
 	"github.com/mchaelhuang/aquafarm/internal"
 	"github.com/mchaelhuang/aquafarm/internal/constant"
 	"github.com/mchaelhuang/aquafarm/internal/entity"
-	"go.uber.org/zap"
 )
 
 type PondUC struct {
@@ -41,18 +42,17 @@ func (f *PondUC) Get(ctx context.Context, filter entity.PondFilter) (entity.Pond
 }
 
 func (f *PondUC) Store(ctx context.Context, pond entity.Pond) (int, error) {
-	farms, err := f.farmRepo.Get(ctx, entity.FarmFilter{
-		Farm: entity.Farm{
-			ID: pond.FarmID,
-		},
-	})
+	// Check farm should exist
+	farmFilter := entity.FarmFilter{
+		Farm: entity.Farm{ID: pond.FarmID},
+	}
+	_, err := f.farmRepo.Get(ctx, farmFilter)
 	if errors.Is(err, constant.ErrNotFound) {
 		return 0, constant.ErrIncorrectFarmID
 	}
 	if err != nil {
 		return 0, err
 	}
-	f.logger.Debug("farms", zap.Any("farms", farms))
 
 	return f.pondRepo.Store(ctx, pond)
 }

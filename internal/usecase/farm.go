@@ -39,6 +39,7 @@ func (f *FarmUC) Get(ctx context.Context, filter entity.FarmFilter) (entity.Farm
 		},
 	}
 
+	// Get relations
 	farm.Ponds, err = f.pondRepo.Get(ctx, pondFilter)
 	if err != nil {
 		return entity.Farm{}, err
