@@ -1,0 +1,18 @@
+{
+  "app": {
+    "address": ":8080"
+  },
+  "storage": {
+    "postgres": {
+      "host": "aquafarm-postgres",
+      "port": 5432,
+      "user": "aquafarm",
+      "password": "password",
+      "name": "aquafarm"
+    },
+    "redis": {
+      "address": "aquafarm-redis:6379",
+      "password": ""
+    }
+  }
+}
