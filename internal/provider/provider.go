@@ -44,7 +44,9 @@ func DatabaseProvider(cfg *config.Cfg) *gorm.DB {
 		)
 
 		var err error
-		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+			TranslateError: true,
+		})
 		if err != nil {
 			logger.Fatal("failed open database", zap.Error(err))
 		}

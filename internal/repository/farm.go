@@ -79,6 +79,9 @@ func (f *FarmRepo) Store(ctx context.Context, farm entity.Farm) (int, error) {
 	if farm.ID == 0 {
 		// Create new record
 		err := tx.Create(&farm).Error
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return 0, constant.ErrDuplicateRecord
+		}
 		if err != nil {
 			return 0, err
 		}

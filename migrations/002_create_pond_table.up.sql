@@ -15,5 +15,9 @@ create table pond
     deleted_at timestamp
 );
 
+create unique index pond_farm_id_label_unique
+    on pond (farm_id, label)
+    where deleted_at is null;
+
 -- +goose Down
 drop table if exists pond cascade;

@@ -1,5 +1,5 @@
 -- +goose Up
-create table public.farm
+create table farm
 (
     id         serial
         constraint farm_pk
@@ -11,9 +11,9 @@ create table public.farm
     deleted_at timestamp
 );
 
-alter table farm
-    add constraint farm_name_location_unique
-        unique (name, location);
+create unique index farm_name_location_unique
+    on farm (name, location)
+    where deleted_at is null;
 
 -- +goose Down
 drop table if exists farm cascade;

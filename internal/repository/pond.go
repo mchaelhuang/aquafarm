@@ -81,6 +81,9 @@ func (p *PondRepo) Store(ctx context.Context, pond entity.Pond) (int, error) {
 	if pond.ID == 0 {
 		// Create new record
 		err := tx.Create(&pond).Error
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return 0, constant.ErrDuplicateRecord
+		}
 		if err != nil {
 			return 0, err
 		}
